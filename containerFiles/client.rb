@@ -6,7 +6,7 @@ require 'json'
 require 'awesome_print'
 
 @nodeID = ENV['NODE_ID']
-@url    = "ws://mjw-u14-ruby"
+@url    = "ws://mjw-vm-ruby"
 @timer  = nil
 
 def formatMessage(time, messageType, clientID, messageData = "")
