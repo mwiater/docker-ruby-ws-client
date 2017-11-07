@@ -25,6 +25,8 @@ EM.run {
   )
 
   ws.onopen = lambda do |event|
+    ws.send(formatMessage(Time.now, "nodeConnection", @nodeID));
+
     if @timer.nil?
       @timer = EventMachine::PeriodicTimer.new(5) do
         puts "Sending nodeHeartbeat...".green
@@ -48,6 +50,29 @@ EM.run {
   end
 
   ws.onmessage = lambda do |message|
-    p [:message, message.data]
+    begin
+      message = JSON.parse(message.data, :symbolize_names => :true)
+      
+      case message[:type]
+      when "heartbeat"
+        puts "⇄ INCOMING ⇄".white
+        puts "Valid Server Message received:".green
+        puts "  Time:      #{message[:time]}".green
+        puts "  Type:      #{message[:type]}".green
+        puts "  Client ID: #{message[:clientID]}".green
+        puts "  Data:      #{message[:data]}".green
+        puts "✭ ✭ ✭ ✭ ✭ ✭ ✭ ✭ ✭ ✭ ✭ ✭ ✭ ✭ ✭ ✭ ✭ ✭ ✭ ✭"
+        puts ""
+      else
+        puts "Unknown message type: #{message[:type]}".red
+        puts "  Data: #{message[:data]}".red
+        puts "-----"
+        puts ""
+      end
+
+    rescue Exception => e
+      puts "Invalid message format, could not parse: #{message}"
+      ap e
+    end
   end
 }
